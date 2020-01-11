@@ -5,7 +5,7 @@ if diff -aqr -x=.git /mars/git /mars/git_bak
 then
 	echo "Match!"
 else
-	echo "No match..dd!"
+	echo "No match.."
 	cp /mars/git/MARS_Sensor/deploy/*.sh /mars/deploy
 	cd /mars/deploy
     chmod +x *.sh
