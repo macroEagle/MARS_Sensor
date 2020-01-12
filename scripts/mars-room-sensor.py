@@ -1,6 +1,6 @@
 import requests
 import configparser
-
+import time
 
 config = configparser.ConfigParser()
 
@@ -46,7 +46,7 @@ headers = {
         
 def get_and_send_sensor_signal():
     
-    if(check_room_availability_by_sensors):
+    if(check_room_availability_by_sensors()):
         post_room_status('on')
     else:
         post_room_status('off')
@@ -68,7 +68,7 @@ def check_room_availability_by_sensors():
             
 
 def get_motion_sensor_status(motion_sensor_name):
-    url = 'http://127.0.0.1:8123/api/states/binary_sensor'+motion_sensor_name
+    url = 'http://127.0.0.1:8123/api/states/binary_sensor.'+motion_sensor_name
     response = requests.get(url, headers=headers)
     
     data = 'off'
