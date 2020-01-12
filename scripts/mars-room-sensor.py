@@ -17,32 +17,32 @@ headers = {
     'Content-Type': 'application/json',
 }
 
-def get_and_send_sensor_signal():
-    global pending_send_faces
-    global toilet_status
-    send_start = time.time()
-    #print(str(send_start) + ":" + str(pending_send_faces))
-    #response = requests.get(lift_url+str(pending_send_faces), headers=headers)
-    sensor_states = get_sensor()
+# def get_and_send_sensor_signal():
+    # global pending_send_faces
+    # global toilet_status
+    # send_start = time.time()
+    # #print(str(send_start) + ":" + str(pending_send_faces))
+    # #response = requests.get(lift_url+str(pending_send_faces), headers=headers)
+    # sensor_states = get_sensor()
     
-    print(str(send_start) + ":\t\t\t\t" + str(sensor_states).upper())
-    if(sensor_states =='on' and toilet_status!='1'):
-        toilet_status = '1'
-        request_url = toilet_url+str(toilet_status)
-        print("Sending..."+request_url)
-        response = requests.get(request_url, headers=headers)
-        print("Send to server" + str(toilet_status) + ":"+str(response.status_code))
-        url_post = 'http://127.0.0.1:8123/api/services/light/turn_on'
-        response = requests.post(url=url_post)
+    # print(str(send_start) + ":\t\t\t\t" + str(sensor_states).upper())
+    # if(sensor_states =='on' and toilet_status!='1'):
+        # toilet_status = '1'
+        # request_url = toilet_url+str(toilet_status)
+        # print("Sending..."+request_url)
+        # response = requests.get(request_url, headers=headers)
+        # print("Send to server" + str(toilet_status) + ":"+str(response.status_code))
+        # url_post = 'http://127.0.0.1:8123/api/services/light/turn_on'
+        # response = requests.post(url=url_post)
         
-    if(sensor_states !='on' and toilet_status=='1'):
-        toilet_status = '0'
-        request_url = toilet_url+str(toilet_status)
-        print("Sending..."+request_url)
-        response = requests.get(request_url, headers=headers)
-        print("Send to server" + str(toilet_status) + ":"+str(response.status_code))        
-        url_post = 'http://127.0.0.1:8123/api/services/light/turn_off'
-        response = requests.post(url=url_post)
+    # if(sensor_states !='on' and toilet_status=='1'):
+        # toilet_status = '0'
+        # request_url = toilet_url+str(toilet_status)
+        # print("Sending..."+request_url)
+        # response = requests.get(request_url, headers=headers)
+        # print("Send to server" + str(toilet_status) + ":"+str(response.status_code))        
+        # url_post = 'http://127.0.0.1:8123/api/services/light/turn_off'
+        # response = requests.post(url=url_post)
         
 def get_and_send_sensor_signal():
     
