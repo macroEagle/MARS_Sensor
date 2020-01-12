@@ -50,15 +50,15 @@ cloud_headers = {
 def get_and_send_sensor_signal():
     
     if(check_room_availability_by_sensors()):
-        post_room_status("{1}")
+        post_room_status("1")
     else:
-        post_room_status("{0}")
+        post_room_status("0")
 
 def post_room_status(room_status):
     post_url = room_url
     responseCode = 123
     retryTimes = cloudRetryTimes
-    while(responseCode!=200 and retryTimes >=0):
+    while((responseCode!=200 or responseCode!=201) and retryTimes >=0):
         print("Sending..."+post_url)
         response = requests.post(url=post_url,data = room_status, headers = cloud_headers)
         print("Send to server with data:" + str(room_status) + ":"+str(response.status_code))  
