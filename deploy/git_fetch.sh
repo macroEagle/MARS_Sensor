@@ -1,6 +1,9 @@
 cd /mars/git/MARS_Sensor
 git fetch
-if git diff-index --quiet HEAD --; then
+
+CHANGED=$(git diff master origin/master)
+if [ ! -n "$CHANGED" ]; then
+#if git diff-index --quiet HEAD --; then
 	echo "Match."
 else
 	echo "No Match."
