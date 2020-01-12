@@ -58,7 +58,7 @@ def post_room_status(room_status):
     post_url = room_url
     responseCode = 123
     retryTimes = cloudRetryTimes
-    while((responseCode!=200 or responseCode!=201) and retryTimes >=0):
+    while(responseCode!=200 or responseCode!=201 or retryTimes >=0):
         print("Sending..."+post_url)
         response = requests.post(url=post_url,data = room_status, headers = cloud_headers)
         print("Send to server with data:" + str(room_status) + ":"+str(response.status_code))  
