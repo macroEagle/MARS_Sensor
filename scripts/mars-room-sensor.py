@@ -10,7 +10,7 @@ room_status = '0'
 sleep_interval = 1
 motion_sensor_name_list = ['mars_motion_1','mars_motion_2']
 
-room_url = 'http://139.224.70.36:8443/api/rooms/'+config['room']['room_no']+'/status'
+room_url = 'http://139.224.70.36:8443/rooms/'+config['room']['room_no']+'/status'
 api_headers = {
     'Authorization': 'Bearer '+config['homeassistant']['api_token'],
     'Content-Type': 'application/json',
