@@ -7,7 +7,7 @@ config = configparser.ConfigParser()
 config.read('/mars/mars-room.ini')
 
 cloudRetryTimes = 5
-sleep_interval = 1
+sleep_interval = 300
 motion_sensor_name_list = ['mars_motion_1','mars_motion_2']
 
 room_url = 'http://139.224.70.36:8443/rooms/'+config['room']['room_no']+'/status'
@@ -100,6 +100,7 @@ def get_motion_sensor_status(motion_sensor_name):
  
 if __name__ == '__main__':
     
+    time.sleep(200)#sleep for 200 to wait ha service to start
     try:     
         while(True):
             get_and_send_sensor_signal()            
