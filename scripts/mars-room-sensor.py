@@ -6,7 +6,7 @@ config = configparser.ConfigParser()
 
 config.read('/mars/mars-room.ini')
 
-room_status = '0'
+cloudRetryTimes = 5
 sleep_interval = 1
 motion_sensor_name_list = ['mars_motion_1','mars_motion_2']
 
@@ -50,15 +50,21 @@ cloud_headers = {
 def get_and_send_sensor_signal():
     
     if(check_room_availability_by_sensors()):
-        post_room_status('1')
+        post_room_status(1)
     else:
-        post_room_status('0')
+        post_room_status(0)
 
 def post_room_status(room_status):
     post_url = room_url
-    print("Sending..."+post_url)
-    response = requests.post(url=post_url,data = room_status, headers = cloud_headers)
-    print("Send to server" + str(room_status) + ":"+str(response.status_code))  
+    responseCode = 123
+    retryTimes = cloudRetryTimes
+    while(responseCode==200 && retryTimes ==0):
+        print("Sending..."+post_url)
+        response = requests.post(url=post_url,data = room_status, headers = cloud_headers)
+        print("Send to server" + str(room_status) + ":"+str(response.status_code))  
+        responseCode = response.status_code
+        retryTimes = retryTimes - 1
+        time.sleep(1)
     
 
 def check_room_availability_by_sensors():
