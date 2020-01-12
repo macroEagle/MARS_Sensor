@@ -59,10 +59,10 @@ def post_room_status(room_status):
     
 
 def check_room_availability_by_sensors():
-    motion_sensor_status = false
+    motion_sensor_status = False
     for motion_sensor_name in motion_sensor_name_list:
         if(get_motion_sensor_status(motion_sensor_name)):
-            motion_sensor_status = true
+            motion_sensor_status = True
             
     return motion_sensor_status
             
