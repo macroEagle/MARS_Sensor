@@ -48,7 +48,7 @@ def get_and_send_sensor_signal():
     
     if(check_room_availability_by_sensors):
         post_room_status('on')
-    else
+    else:
         post_room_status('off')
 
 def post_room_status(room_status):
@@ -80,7 +80,7 @@ def get_motion_sensor_status(motion_sensor_name):
     
     if(data == 'off'):
         return false
-    else
+    else:
         return true
     
 
