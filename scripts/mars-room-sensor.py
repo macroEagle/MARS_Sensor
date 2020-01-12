@@ -79,9 +79,9 @@ def get_motion_sensor_status(motion_sensor_name):
     print("[get_motion_sensor_status]: HTTP response = "+str(response.status_code) + " status ="+str(data))
     
     if(data == 'off'):
-        return false
+        return False
     else:
-        return true
+        return True
     
 
 ### Main ######################################################################
