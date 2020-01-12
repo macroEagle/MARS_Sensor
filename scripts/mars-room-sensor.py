@@ -6,14 +6,17 @@ config = configparser.ConfigParser()
 
 config.read('/mars/mars-room.ini')
 
-room_url = 'http://207.246.95.229/api/room/1/'
 room_status = '0'
 sleep_interval = 1
 motion_sensor_name_list = ['mars_motion_1','mars_motion_2']
 
-
-headers = {
+room_url = 'http://139.224.70.36:8443/api/rooms/'+config['room']['room_no']+'/status'
+api_headers = {
     'Authorization': 'Bearer '+config['homeassistant']['api_token'],
+    'Content-Type': 'application/json',
+}
+
+cloud_headers = {
     'Content-Type': 'application/json',
 }
 
@@ -47,14 +50,14 @@ headers = {
 def get_and_send_sensor_signal():
     
     if(check_room_availability_by_sensors()):
-        post_room_status('on')
+        post_room_status('1')
     else:
-        post_room_status('off')
+        post_room_status('0')
 
 def post_room_status(room_status):
-    post_url = room_url+str(room_status)
+    post_url = room_url
     print("Sending..."+post_url)
-    response = requests.post(url=post_url)
+    response = requests.post(url=post_url,data = room_status, headers = cloud_headers)
     print("Send to server" + str(room_status) + ":"+str(response.status_code))  
     
 
@@ -69,7 +72,7 @@ def check_room_availability_by_sensors():
 
 def get_motion_sensor_status(motion_sensor_name):
     url = 'http://127.0.0.1:8123/api/states/binary_sensor.'+motion_sensor_name
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=api_headers)
     
     data = 'off'
     
