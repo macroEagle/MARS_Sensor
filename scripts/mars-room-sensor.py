@@ -2,17 +2,25 @@ import requests
 import configparser
 import time
 
-config = configparser.ConfigParser()
+sensor_config = configparser.ConfigParser()
+mars_config = configparser.ConfigParser()
 
-config.read('/mars/mars-room.ini')
+sensor_config.read('/mars/mars-sensor.ini')
+mars_config.read('/mars/scripts/mars.ini')
 
-cloudRetryTimes = 5
-sleep_interval = 300
-motion_sensor_name_list = ['mars_motion_1','mars_motion_2']
+# Read MARS configuration
+cloudRetryTimes = mars_config['mars']['post_retry_times']
+sleep_interval = mars_config['mars']['post_interval']
 
-room_url = 'http://139.224.70.36:8443/rooms/'+config['room']['room_no']+'/status'
+# Read sensor configuration
+sensor_id = 'sensor_'+ sensor_config['sensor']['sensor_id']
+server_room_id = mars_config[sensor_id]['server_room_id']
+motion_sensor_name_list = mars_config[sensor_id]['motion_sensor'].split(';')
+
+room_url = mars_config['mars']['post_url_room_status']+sensor_config['room']['room_no']+'/status'
+
 api_headers = {
-    'Authorization': 'Bearer '+config['homeassistant']['api_token'],
+    'Authorization': 'Bearer '+sensor_config['homeassistant']['api_token'],
     'Content-Type': 'application/json',
 }
 
@@ -60,14 +68,16 @@ def post_room_status(room_status):
     retryTimes = cloudRetryTimes
     while(retryTimes > 0):
         print("Sending..."+post_url)
-        response = requests.post(url=post_url,data = room_status, headers = cloud_headers)
-        print("Send to server with data:" + str(room_status) + ":"+str(response.status_code))  
-        responseCode = response.status_code
-        if(responseCode==200 or responseCode==201):
-            retryTimes = 0
-        else:
-            retryTimes = retryTimes - 1
-        time.sleep(1)
+        try:
+            response = requests.post(url=post_url,data = room_status, headers = cloud_headers)
+            print("Send to server with data:" + str(room_status) + ":"+str(response.status_code))  
+            responseCode = response.status_code
+        finally:
+            if(responseCode==200 or responseCode==201):
+                retryTimes = 0
+            else:
+                retryTimes = retryTimes - 1
+            time.sleep(1)
     
 
 def check_room_availability_by_sensors():
@@ -81,14 +91,15 @@ def check_room_availability_by_sensors():
 
 def get_motion_sensor_status(motion_sensor_name):
     url = 'http://127.0.0.1:8123/api/states/binary_sensor.'+motion_sensor_name
-    response = requests.get(url, headers=api_headers)
-    
     data = 'off'
     
-    if (response.status_code == 200):
-        data = response.json()['state']
+    try:
+        response = requests.get(url, headers=api_headers)    
+        if (response.status_code == 200):
+            data = response.json()['state']
 
-    print("[get_motion_sensor_status]: HTTP response = "+str(response.status_code) + " status ="+str(data))
+    finally:
+        print("[get_motion_sensor_status]: HTTP response = "+str(response.status_code) + " status ="+str(data))
     
     if(data == 'off'):
         return False
