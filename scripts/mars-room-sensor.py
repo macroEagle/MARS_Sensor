@@ -99,7 +99,7 @@ def get_motion_sensor_status(motion_sensor_name):
             data = response.json()['state']
 
     finally:
-        print("[get_motion_sensor_status]: HTTP response = "+str(response.status_code) + " status ="+str(data))
+        print("[get_motion_sensor_status]["+motion_sensor_name+"]: HTTP response = "+str(response.status_code) + " status ="+str(data))
     
     if(data == 'off'):
         return False
