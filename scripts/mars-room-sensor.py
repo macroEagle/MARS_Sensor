@@ -72,6 +72,8 @@ def post_room_status(room_status):
             response = requests.post(url=post_url,data = room_status, headers = cloud_headers)
             print("Send to server with data:" + str(room_status) + ":"+str(response.status_code))  
             responseCode = response.status_code
+        except requests.exceptions.RequestException as e:
+            print e
         finally:
             if(responseCode==200 or responseCode==201):
                 retryTimes = 0
@@ -99,7 +101,8 @@ def get_motion_sensor_status(motion_sensor_name):
         responseCode = response.status_code
         if (responseCode == 200):
             data = response.json()['state']
-
+    except requests.exceptions.RequestException as e:
+        print e
     finally:
         print("[get_motion_sensor_status]["+motion_sensor_name+"]: HTTP response = "+str(responseCode) + " status ="+str(data))
     
