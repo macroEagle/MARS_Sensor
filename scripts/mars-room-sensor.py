@@ -92,14 +92,16 @@ def check_room_availability_by_sensors():
 def get_motion_sensor_status(motion_sensor_name):
     url = 'http://127.0.0.1:8123/api/states/binary_sensor.'+motion_sensor_name
     data = 'off'
+    responseCode = 123
     
     try:
-        response = requests.get(url, headers=api_headers)    
-        if (response.status_code == 200):
+        response = requests.get(url, headers=api_headers)  
+        responseCode = response.status_code
+        if (responseCode == 200):
             data = response.json()['state']
 
     finally:
-        print("[get_motion_sensor_status]["+motion_sensor_name+"]: HTTP response = "+str(response.status_code) + " status ="+str(data))
+        print("[get_motion_sensor_status]["+motion_sensor_name+"]: HTTP response = "+str(responseCode) + " status ="+str(data))
     
     if(data == 'off'):
         return False
