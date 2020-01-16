@@ -9,8 +9,8 @@ sensor_config.read('/mars/mars-sensor.ini')
 mars_config.read('/mars/scripts/mars.ini')
 
 # Read MARS configuration
-cloudRetryTimes = mars_config['mars']['post_retry_times']
-sleep_interval = mars_config['mars']['post_interval']
+cloudRetryTimes = int(mars_config['mars']['post_retry_times'])
+sleep_interval = int(mars_config['mars']['post_interval'])
 
 # Read sensor configuration
 sensor_id = 'sensor_'+ sensor_config['sensor']['sensor_id']
@@ -111,7 +111,7 @@ def get_motion_sensor_status(motion_sensor_name):
  
 if __name__ == '__main__':
     
-    time.sleep(200)#sleep for 200 to wait ha service to start
+    #time.sleep(200)#sleep for 200 to wait ha service to start
     try:     
         while(True):
             get_and_send_sensor_signal()            
