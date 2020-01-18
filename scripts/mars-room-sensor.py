@@ -1,6 +1,9 @@
 import requests
 import configparser
 import time
+import logging
+
+logging.basicConfig(filename="/mars/logs/mars_room_sensor.log", level=logging.DEBUG,format='%(asctime)s %(message)s')
 
 sensor_config = configparser.ConfigParser()
 mars_config = configparser.ConfigParser()
@@ -27,33 +30,6 @@ api_headers = {
 cloud_headers = {
     'Content-Type': 'application/json',
 }
-
-# def get_and_send_sensor_signal():
-    # global pending_send_faces
-    # global toilet_status
-    # send_start = time.time()
-    # #print(str(send_start) + ":" + str(pending_send_faces))
-    # #response = requests.get(lift_url+str(pending_send_faces), headers=headers)
-    # sensor_states = get_sensor()
-    
-    # print(str(send_start) + ":\t\t\t\t" + str(sensor_states).upper())
-    # if(sensor_states =='on' and toilet_status!='1'):
-        # toilet_status = '1'
-        # request_url = toilet_url+str(toilet_status)
-        # print("Sending..."+request_url)
-        # response = requests.get(request_url, headers=headers)
-        # print("Send to server" + str(toilet_status) + ":"+str(response.status_code))
-        # url_post = 'http://127.0.0.1:8123/api/services/light/turn_on'
-        # response = requests.post(url=url_post)
-        
-    # if(sensor_states !='on' and toilet_status=='1'):
-        # toilet_status = '0'
-        # request_url = toilet_url+str(toilet_status)
-        # print("Sending..."+request_url)
-        # response = requests.get(request_url, headers=headers)
-        # print("Send to server" + str(toilet_status) + ":"+str(response.status_code))        
-        # url_post = 'http://127.0.0.1:8123/api/services/light/turn_off'
-        # response = requests.post(url=url_post)
         
 def get_and_send_sensor_signal():
     
@@ -70,10 +46,10 @@ def post_room_status(room_status):
         print("Sending..."+post_url)
         try:
             response = requests.post(url=post_url,data = room_status, headers = cloud_headers)
-            print("Send to server with data:" + str(room_status) + ":"+str(response.status_code))  
+            log_debug("Send to server with data:" + str(room_status) + ":"+str(response.status_code))  
             responseCode = response.status_code
         except requests.exceptions.RequestException as e:
-            print e
+            log_error(e)
         finally:
             if(responseCode==200 or responseCode==201):
                 retryTimes = 0
@@ -89,8 +65,7 @@ def check_room_availability_by_sensors():
             motion_sensor_status = True
             
     return motion_sensor_status
-            
-
+    
 def get_motion_sensor_status(motion_sensor_name):
     url = 'http://127.0.0.1:8123/api/states/binary_sensor.'+motion_sensor_name
     data = 'off'
@@ -102,24 +77,34 @@ def get_motion_sensor_status(motion_sensor_name):
         if (responseCode == 200):
             data = response.json()['state']
     except requests.exceptions.RequestException as e:
-        print e
+        log_error(e)
     finally:
-        print("[get_motion_sensor_status]["+motion_sensor_name+"]: HTTP response = "+str(responseCode) + " status ="+str(data))
+        log_debug("[get_motion_sensor_status]["+motion_sensor_name+"]: HTTP response = "+str(responseCode) + " status ="+str(data))
     
     if(data == 'off'):
         return False
     else:
         return True
     
+def log_debug(debug):
+    logging.debug(debug)   
+    
+def log_info(info):
+    logging.info(info)     
+
+def log_error(error):
+    logging.error(error)
+           
 
 ### Main ######################################################################
  
 if __name__ == '__main__':
     
     #time.sleep(200)#sleep for 200 to wait ha service to start
+    log_info("MARS sensor room start...")
     try:     
         while(True):
             get_and_send_sensor_signal()            
             time.sleep(sleep_interval)
     finally:
-        print("End")
+        log_info("MARS sensor room end.")
