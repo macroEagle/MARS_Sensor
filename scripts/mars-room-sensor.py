@@ -104,7 +104,8 @@ if __name__ == '__main__':
     log_info("MARS sensor room start...")
     try:     
         while(True):
-            get_and_send_sensor_signal()            
+            get_and_send_sensor_signal() 
+            log_info("Sleep for "+str(sleep_interval)+" seconds.")
             time.sleep(sleep_interval)
     finally:
         log_info("MARS sensor room end.")
