@@ -20,7 +20,7 @@ sensor_id = 'sensor_'+ sensor_config['sensor']['sensor_id']
 server_room_id = mars_config[sensor_id]['server_room_id']
 motion_sensor_name_list = mars_config[sensor_id]['motion_sensor'].split(';')
 
-room_url = mars_config['mars']['post_url_room_status']+sensor_config['room']['room_no']+'/status'
+room_url = mars_config['mars']['post_url_room_status']+server_room_id+'/status'
 
 api_headers = {
     'Authorization': 'Bearer '+sensor_config['homeassistant']['api_token'],
