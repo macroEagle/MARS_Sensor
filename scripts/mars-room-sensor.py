@@ -100,6 +100,9 @@ def get_motion_sensor_status(motion_sensor_name):
     finally:
         log_debug("[get_motion_sensor_status]["+motion_sensor_name+"]: HTTP response = "+str(responseCode) + " status ="+str(data))
     
+    if(data != 'on' and data != 'off'):
+        data = 'error'
+        
     return data
     
 def log_debug(debug):
