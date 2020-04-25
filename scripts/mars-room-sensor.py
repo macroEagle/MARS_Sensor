@@ -14,6 +14,7 @@ mars_config.read('/mars/scripts/mars.ini')
 # Read MARS configuration
 cloudRetryTimes = int(mars_config['mars']['post_retry_times'])
 sleep_interval = int(mars_config['mars']['post_interval'])
+sensor_interval = 10
 
 # Read sensor configuration
 sensor_id = 'sensor_'+ sensor_config['sensor']['sensor_id']
@@ -32,11 +33,22 @@ cloud_headers = {
 }
         
 def get_and_send_sensor_signal():
+    sleep_count = sleep_interval / sensor_interval
+    sleep_time = 0
+    room_availability = 'error'
+    while(sleep_time < sleep_count):
+        if(room_availability != 'on'):
+            room_availability = check_room_availability_by_sensors()
+        log_info("Sleep for "+str(sleep_interval)+" seconds,with room availability = " + room_availability)
+        time.sleep(sleep_interval)
     
-    if(check_room_availability_by_sensors()):
+    if(room_availability == 'on'):
         post_room_status("1")
     else:
-        post_room_status("0")
+        if(room_availability == 'off'):
+            post_room_status("0")
+        else:
+            post_room_status("-1")        
 
 def post_room_status(room_status):
     post_url = room_url
@@ -59,16 +71,22 @@ def post_room_status(room_status):
     
 
 def check_room_availability_by_sensors():
-    motion_sensor_status = False
+    all_motion_sensor_status = 'error'
+    one_motion_sensor_status = 'error'
     for motion_sensor_name in motion_sensor_name_list:
-        if(get_motion_sensor_status(motion_sensor_name)):
-            motion_sensor_status = True
+        one_motion_sensor_status = get_motion_sensor_status(motion_sensor_name)
+        if(one_motion_sensor_status == 'on'):
+            all_motion_sensor_status = 'on'
+        else:
+            if(all_motion_sensor_status == 'error' and one_motion_sensor_status == 'off'):
+                all_motion_sensor_status = 'off'     
             
-    return motion_sensor_status
-    
+    return all_motion_sensor_status
+
+# Return stats: on / off / error    
 def get_motion_sensor_status(motion_sensor_name):
     url = 'http://127.0.0.1:8123/api/states/binary_sensor.'+motion_sensor_name
-    data = 'off'
+    data = 'error'
     responseCode = 123
     
     try:
@@ -81,10 +99,7 @@ def get_motion_sensor_status(motion_sensor_name):
     finally:
         log_debug("[get_motion_sensor_status]["+motion_sensor_name+"]: HTTP response = "+str(responseCode) + " status ="+str(data))
     
-    if(data == 'off'):
-        return False
-    else:
-        return True
+    return data
     
 def log_debug(debug):
     logging.debug(debug)   
@@ -105,7 +120,5 @@ if __name__ == '__main__':
     try:     
         while(True):
             get_and_send_sensor_signal() 
-            log_info("Sleep for "+str(sleep_interval)+" seconds.")
-            time.sleep(sleep_interval)
     finally:
         log_info("MARS sensor room end.")
