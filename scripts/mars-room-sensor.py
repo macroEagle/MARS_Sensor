@@ -39,8 +39,9 @@ def get_and_send_sensor_signal():
     while(sleep_time < sleep_count):
         if(room_availability != 'on'):
             room_availability = check_room_availability_by_sensors()
-        log_info("Sleep for "+str(sleep_interval)+" seconds,with room availability = " + room_availability)
-        time.sleep(sleep_interval)
+        log_info("Sleep for "+str(sensor_interval)+" seconds ["+str(sleep_time)+"],with room availability = " + room_availability)
+        time.sleep(sensor_interval)
+        sleep_time = sleep_time + 1
     
     if(room_availability == 'on'):
         post_room_status("1")
