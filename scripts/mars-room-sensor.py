@@ -3,7 +3,7 @@ import configparser
 import time
 import logging
 
-logging.basicConfig(filename="/mars/logs/mars_room_sensor.log", level=logging.DEBUG,format='%(asctime)s %(message)s')
+from logging.handlers import RotatingFileHandler
 
 sensor_config = configparser.ConfigParser()
 mars_config = configparser.ConfigParser()
@@ -11,18 +11,31 @@ mars_config = configparser.ConfigParser()
 sensor_config.read('/mars/mars-sensor.ini')
 mars_config.read('/mars/scripts/mars.ini')
 
-# Read MARS configuration
+# === Read MARS configuration ===
 cloudRetryTimes = int(mars_config['mars']['post_retry_times'])
 sleep_interval = int(mars_config['mars']['post_interval'])
 sensor_interval = 10
 
-# Read sensor configuration
+# === Read sensor configuration ===
 sensor_id = 'sensor_'+ sensor_config['sensor']['sensor_id']
 server_room_id = mars_config[sensor_id]['server_room_id']
 motion_sensor_name_list = mars_config[sensor_id]['motion_sensor'].split(';')
 
 room_url = mars_config['mars']['post_url_room_status']+server_room_id+'/status'
 
+# === Init logger ===
+logger = logging.getLogger("MARS")
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+logger.setLevel(logging.DEBUG)    
+
+# add a rotating handler
+handler = RotatingFileHandler(mars_config['logger']['log_file'], maxBytes=int(mars_config['logger']['file_size']), backupCount=int(mars_config['logger']['backup_count']))
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
+#logging.basicConfig(filename="/mars/logs/mars_room_sensor.log", level=logging.DEBUG,format='%(asctime)s %(message)s')
+
+# Init headers
 api_headers = {
     'Authorization': 'Bearer '+sensor_config['homeassistant']['api_token'],
     'Content-Type': 'application/json',
@@ -101,18 +114,19 @@ def get_motion_sensor_status(motion_sensor_name):
         log_debug("[get_motion_sensor_status]["+motion_sensor_name+"]: HTTP response = "+str(responseCode) + " status ="+str(data))
     
     if(data != 'on' and data != 'off'):
+        log_error("return data wrong ["+str(data)+"]")
         data = 'error'
         
     return data
     
 def log_debug(debug):
-    logging.debug(debug)   
+    logger.debug(debug)   
     
 def log_info(info):
-    logging.info(info)     
+    logger.info(info)     
 
 def log_error(error):
-    logging.error(error)
+    logger.error(error)
            
 
 ### Main ######################################################################
