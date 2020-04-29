@@ -52,7 +52,8 @@ def get_and_send_sensor_signal():
         for sensor_room in sensor_room_list:
             if(room_availability[sensor_room] != 'on'):
                 room_availability[sensor_room] = check_room_availability_by_sensors(sensor_room)
-        log_info("Sleep for "+str(sensor_interval)+" seconds ["+str(sleep_time)+"],with room availability = " + room_availability)
+            log_info("Room availability for " + sensor_room + " = " + room_availability[sensor_room])
+        log_info("Sleep for "+str(sensor_interval)+" seconds ["+str(sleep_time)+"].")
         time.sleep(sensor_interval)
         sleep_time = sleep_time + 1
     
