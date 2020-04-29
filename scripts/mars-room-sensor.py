@@ -17,11 +17,7 @@ sleep_interval = int(mars_config['mars']['post_interval'])
 sensor_interval = 10
 
 # === Read sensor configuration ===
-sensor_id = 'sensor_'+ sensor_config['sensor']['sensor_id']
-server_room_id = mars_config[sensor_id]['server_room_id']
-motion_sensor_name_list = mars_config[sensor_id]['motion_sensor'].split(';')
-
-room_url = mars_config['mars']['post_url_room_status']+server_room_id+'/status'
+sensor_room_list = sensor_config['sensor']['sensor_id'].split(';')
 
 # === Init logger ===
 logger = logging.getLogger("MARS")
@@ -48,24 +44,27 @@ cloud_headers = {
 def get_and_send_sensor_signal():
     sleep_count = sleep_interval / sensor_interval
     sleep_time = 0
-    room_availability = 'error'
+    for sensor_room in sensor_room_list:
+        room_availability[sensor_room] = 'error'
     while(sleep_time < sleep_count):
-        if(room_availability != 'on'):
-            room_availability = check_room_availability_by_sensors()
+        for sensor_room in sensor_room_list:
+            if(room_availability[sensor_room] != 'on'):
+                room_availability[sensor_room] = check_room_availability_by_sensors(sensor_room)
         log_info("Sleep for "+str(sensor_interval)+" seconds ["+str(sleep_time)+"],with room availability = " + room_availability)
         time.sleep(sensor_interval)
         sleep_time = sleep_time + 1
     
-    if(room_availability == 'on'):
-        post_room_status("1")
-    else:
-        if(room_availability == 'off'):
-            post_room_status("0")
+    for sensor_room in sensor_room_list:
+        if(room_availability[sensor_room] == 'on'):
+            post_room_status(sensor_room,"1")
         else:
-            post_room_status("-1")        
+            if(room_availability[sensor_room] == 'off'):
+                post_room_status(sensor_room,"0")
+            else:
+                post_room_status(sensor_room,"-1")        
 
-def post_room_status(room_status):
-    post_url = room_url
+def post_room_status(sensor_room,room_status):
+    post_url = mars_config['mars']['post_url_room_status']+mars_config[sensor_room]['server_room_id']+'/status'
     responseCode = 123
     retryTimes = cloudRetryTimes
     while(retryTimes > 0):
@@ -84,10 +83,10 @@ def post_room_status(room_status):
             time.sleep(1)
     
 
-def check_room_availability_by_sensors():
+def check_room_availability_by_sensors(sensor_room):
     all_motion_sensor_status = 'error'
     one_motion_sensor_status = 'error'
-    for motion_sensor_name in motion_sensor_name_list:
+    for motion_sensor_name in mars_config[sensor_room]['motion_sensor'].split(';'):
         one_motion_sensor_status = get_motion_sensor_status(motion_sensor_name)
         if(one_motion_sensor_status == 'on'):
             all_motion_sensor_status = 'on'
