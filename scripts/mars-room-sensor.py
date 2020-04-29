@@ -19,6 +19,9 @@ sensor_interval = 10
 # === Read sensor configuration ===
 sensor_room_list = sensor_config['sensor']['sensor_id'].split(';')
 
+for sensor_room in sensor_room_list:
+    room_availability[sensor_room] = 'error'
+
 # === Init logger ===
 logger = logging.getLogger("MARS")
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
