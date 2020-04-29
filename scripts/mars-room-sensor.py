@@ -50,6 +50,7 @@ def get_and_send_sensor_signal():
         room_availability[sensor_room] = 'error'
     while(sleep_time < sleep_count):
         for sensor_room in sensor_room_list:
+            log_info("Start to check for room : "+sensor_room)
             if(room_availability[sensor_room] != 'on'):
                 room_availability[sensor_room] = check_room_availability_by_sensors(sensor_room)
             log_info("Room availability for " + sensor_room + " = " + room_availability[sensor_room])
