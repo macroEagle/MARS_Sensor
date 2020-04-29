@@ -72,10 +72,10 @@ def post_room_status(sensor_room,room_status):
     responseCode = 123
     retryTimes = cloudRetryTimes
     while(retryTimes > 0):
-        print("Sending..."+post_url)
+        log_debug("Sending..."+post_url)
         try:
             response = requests.post(url=post_url,data = room_status, headers = cloud_headers)
-            log_debug("Send to server with data:" + str(room_status) + ":"+str(response.status_code))  
+            log_debug("Send to server for " + sensor_room + "["+mars_config[sensor_room]['server_room_id']+"] with data:" + str(room_status) + ":"+str(response.status_code))  
             responseCode = response.status_code
         except requests.exceptions.RequestException as e:
             log_error(e)
