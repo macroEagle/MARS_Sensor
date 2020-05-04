@@ -115,7 +115,7 @@ def get_motion_sensor_status(motion_sensor_name):
            cache_sensor_status(motion_sensor_name,motion_sensor_status)
         else:
            motion_sensor_status = 'on'
-           log_debug("Caching motion sensor on status for " + motion_sensor_name + " since [" + str(motion_sensor_last_on_time)+"] ("+time()+").")
+           log_debug("Caching motion sensor on status for " + motion_sensor_name + " since [" + str(motion_sensor_last_on_time)+"] ("+str(time())+").")
     else:
         motion_sensor_status = get_motion_sensor_status_from_ha(motion_sensor_name)
         cache_sensor_status(motion_sensor_name,motion_sensor_status)
@@ -125,7 +125,7 @@ def get_motion_sensor_status(motion_sensor_name):
 def cache_sensor_status(motion_sensor_name,motion_sensor_status):
     if(motion_sensor_status == 'on'):
         sensor_status[motion_sensor_name] = time()
-        log_debug("Start caching for " + motion_sensor_name +" ["+sensor_status[motion_sensor_name]+"]")
+        log_debug("Start caching for " + motion_sensor_name +" ["+str(sensor_status[motion_sensor_name])+"]")
     else:
         sensor_status[motion_sensor_name] = 0
         
