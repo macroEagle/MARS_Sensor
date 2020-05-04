@@ -104,8 +104,11 @@ def check_room_availability_by_sensors(sensor_room):
     return all_motion_sensor_status
     
 def get_motion_sensor_status(motion_sensor_name):
-    motion_sensor_last_on_time = sensor_status[motion_sensor_name]
+    motion_sensor_last_on_time = 0
     motion_sensor_status = 'error'
+    if(motion_sensor_name in sensor_status):
+        motion_sensor_last_on_time = sensor_status[motion_sensor_name]
+        
     if (motion_sensor_last_on_time > 0):
         if(time() - motion_sensor_last_on_time > sensor_on_last_time):
            motion_sensor_status = get_motion_sensor_status_from_ha(motion_sensor_name)
