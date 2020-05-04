@@ -121,7 +121,7 @@ def get_motion_sensor_status(motion_sensor_name):
 def cache_sensor_status(motion_sensor_name,motion_sensor_status):
     if(motion_sensor_status == 'on'):
         sensor_status[motion_sensor_name] = time()
-    else
+    else:
         sensor_status[motion_sensor_name] = 0
         
         
