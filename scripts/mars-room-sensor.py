@@ -14,12 +14,15 @@ mars_config.read('/mars/scripts/mars.ini')
 # === Read MARS configuration ===
 cloudRetryTimes = int(mars_config['mars']['post_retry_times'])
 sleep_interval = int(mars_config['mars']['post_interval'])
+sensor_on_last_time = int(mars_config['mars']['sensor_on_last_time'])
 sensor_interval = 10
 
 # === Read sensor configuration ===
 sensor_room_list = sensor_config['sensor']['sensor_id'].split(';')
 
 room_availability = {}
+
+sensor_status = {}
 
 # === Init logger ===
 logger = logging.getLogger("MARS")
@@ -99,9 +102,31 @@ def check_room_availability_by_sensors(sensor_room):
                 all_motion_sensor_status = 'off'     
             
     return all_motion_sensor_status
-
-# Return stats: on / off / error    
+    
 def get_motion_sensor_status(motion_sensor_name):
+    motion_sensor_last_on_time = sensor_status[motion_sensor_name]
+    motion_sensor_status = 'error'
+    if (motion_sensor_last_on_time > 0):
+        if(time() - motion_sensor_last_on_time > sensor_on_last_time):
+           motion_sensor_status = get_motion_sensor_status_from_ha(motion_sensor_name)
+           cache_sensor_status(motion_sensor_name,motion_sensor_status)
+        else:
+           motion_sensor_status = 'on'
+    else:
+        motion_sensor_status = get_motion_sensor_status_from_ha(motion_sensor_name)
+        cache_sensor_status(motion_sensor_name,motion_sensor_status)
+    
+    return motion_sensor_status
+
+def cache_sensor_status(motion_sensor_name,motion_sensor_status):
+    if(motion_sensor_status == 'on'):
+        sensor_status[motion_sensor_name] = time()
+    else
+        sensor_status[motion_sensor_name] = 0
+        
+        
+# Return stats: on / off / error    
+def get_motion_sensor_status_from_ha(motion_sensor_name):
     url = 'http://127.0.0.1:8123/api/states/binary_sensor.'+motion_sensor_name
     data = 'error'
     responseCode = 123
