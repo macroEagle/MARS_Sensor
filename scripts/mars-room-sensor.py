@@ -49,36 +49,44 @@ cloud_headers = {
 def get_and_send_sensor_signal():
     sleep_count = sleep_interval / sensor_interval
     sleep_time = 0
+    temp_room_availability = 'error'
     for sensor_room in sensor_room_list:
         room_availability[sensor_room] = 'error'
     while(sleep_time < sleep_count):
         for sensor_room in sensor_room_list:
             log_info("Start to check for room : "+sensor_room)
             if(room_availability[sensor_room] != 'on'):
-                room_availability[sensor_room] = check_room_availability_by_sensors(sensor_room)
+                temp_room_availability = check_room_availability_by_sensors(sensor_room)
+                if(room_availability[sensor_room] != temp_room_availability):
+                    room_availability[sensor_room] = temp_room_availability
+                    post_room_status(sensor_room,room_availability[sensor_room])
+                    
             log_info("Room availability for " + sensor_room + " = " + room_availability[sensor_room])
         log_info("Sleep for "+str(sensor_interval)+" seconds ["+str(sleep_time)+"].")
         time.sleep(sensor_interval)
         sleep_time = sleep_time + 1
     
     for sensor_room in sensor_room_list:
-        if(room_availability[sensor_room] == 'on'):
-            post_room_status(sensor_room,"1")
-        else:
-            if(room_availability[sensor_room] == 'off'):
-                post_room_status(sensor_room,"0")
-            else:
-                post_room_status(sensor_room,"-1")        
+        post_room_status(sensor_room,room_availability[sensor_room])       
 
 def post_room_status(sensor_room,room_status):
+    room_status_code = "-1"
+    if(room_status == 'on'):
+        room_status_code = "1"
+    else:
+        if(room_status == 'off'):
+            room_status_code = "0"
+        else:
+            room_status_code = "-1"
+            
     post_url = mars_config['mars']['post_url_room_status']+mars_config[sensor_room]['server_room_id']+'/status'
     responseCode = 123
     retryTimes = cloudRetryTimes
     while(retryTimes > 0):
         log_debug("Sending..."+post_url)
         try:
-            response = requests.post(url=post_url,data = room_status, headers = cloud_headers)
-            log_debug("Send to server for " + sensor_room + "["+mars_config[sensor_room]['server_room_id']+"] with data:" + str(room_status) + ":"+str(response.status_code))  
+            response = requests.post(url=post_url,data = room_status_code, headers = cloud_headers)
+            log_debug("Send to server for " + sensor_room + "["+mars_config[sensor_room]['server_room_id']+"] with data:" + str(room_status_code) + ":"+str(response.status_code))  
             responseCode = response.status_code
         except requests.exceptions.RequestException as e:
             log_error(e)
