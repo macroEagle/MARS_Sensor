@@ -15,7 +15,7 @@ mars_config.read('/mars/scripts/mars.ini')
 cloudRetryTimes = int(mars_config['mars']['post_retry_times'])
 sleep_interval = int(mars_config['mars']['post_interval'])
 sensor_on_last_time = int(mars_config['mars']['sensor_on_last_time'])
-sensor_interval = 10
+sensor_interval = 2
 
 # === Read sensor configuration ===
 sensor_room_list = sensor_config['sensor']['sensor_id'].split(';')
