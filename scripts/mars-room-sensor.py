@@ -18,7 +18,9 @@ sensor_on_last_time = int(mars_config['mars']['sensor_on_last_time'])
 sensor_interval = 2
 
 # === Read sensor configuration ===
-sensor_room_list = sensor_config['sensor']['sensor_id'].split(';')
+raspi_id = sensor_config['sensor']['sensor_id']
+
+sensor_room_list = mars_config['raspi'][raspi_id].split(';')
 
 room_availability = {}
 
